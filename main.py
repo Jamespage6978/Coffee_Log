@@ -1,11 +1,11 @@
 from PyInquirer import prompt, print_json,ValidationError,Validator
 import datetime
 from pprint import pprint
+import json
 class DateValidator(Validator):
     def validate(self,document):
         try:
             datetime.datetime.strptime(document.text, '%d-%m-%Y')
-            print(document.text)
         except ValueError:
             raise ValidationError(
                 message ="Incorrect data format, should be YYYY-MM-DD",
@@ -24,7 +24,7 @@ class Coffee:
         self.T_complete = T_complete
         self.taste = taste
         self.notes = notes
-    
+
     def ratio_calc(self):
         if self.B_method == "espresso":
             rat_calcd = float(self.C_out)/float(self.C_in)
@@ -88,8 +88,42 @@ questions = [
         'message':'Enter how much coffee was used in grams'
         #need validation it is a number
     },
+
+    {
+        'type':'input',
+        'name':'C_out',
+        'message':'Enter final yield of coffee/how much water was used in grams'
+    },
+
+    {
+        'type':'input',
+        'name':'T_complete',
+        'message':'Enter total brew time in seconds'
+    },
+    
+    {
+        'type': 'editor',
+        'name': 'taste',
+        'message': 'Please write your taste notes',
+        'default': 'Taste Notes: ',
+        'eargs': {
+            'editor':'default',
+            'ext':'.txt'
+                }
+    },
+
+    {
+        'type': 'editor',
+        'name': 'R_taste',
+        'message': 'Please write any notes',
+        'default': 'Notes: ',
+        'eargs': {
+            'editor':'default',
+            'ext':'.txt'
+                }
+    },
 ]   
 
 
 answers = prompt(questions)
-pprint(answers)
+print(json.dumps(answers, indent=1))
