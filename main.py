@@ -2,6 +2,8 @@ from PyInquirer import prompt, print_json,ValidationError,Validator
 import datetime
 from pprint import pprint
 import json
+import configparser
+from uuid import uuid1
 class DateValidator(Validator):
     def validate(self,document):
         try:
@@ -11,7 +13,7 @@ class DateValidator(Validator):
                 message ="Incorrect data format, should be YYYY-MM-DD",
                  cursor_position=len(document.text))
 
-class Coffee:
+class Coffee(object):
     def __init__(self,brand,R_date,R_taste,proccess,grind,B_method,C_in,C_out,T_complete,taste,notes):
         self.brand = brand
         self.R_date = R_date
@@ -35,7 +37,15 @@ class Coffee:
             ratio = f"{C_in_calc}grams per 1000ml/1L"
         return ratio
 
-##roast1 = Coffee("Mor welsh coffee company","2/1/2020","","washed","1","espress","32.5","500","30",["tart","cherry","Full"],"notes section")
+    def id_create(self):
+        date_today = datetime.datetime.now().strftime("%Y%m%d")
+        uid = str(uuid1())
+        unique_id = f"{date_today}_{self.B_method[0:3]}{uid}"
+        return unique_id
+
+
+config = configparser.ConfigParser()
+config.read("config.ini")
 
 questions = [
     {
@@ -52,14 +62,10 @@ questions = [
     },
     
     {
-        'type': 'editor',
+        'type': 'input',
         'name': 'R_taste',
-        'message': 'Please write the roasters taste notes',
-        'default': 'Roasters Taste Notes: ',
-        'eargs': {
-            'editor':'default',
-            'ext':'.txt'
-                }
+        'message': 'Please write the ',
+        'default': 'Roasters Taste Notes: '
     },
 
     {
@@ -98,32 +104,44 @@ questions = [
     {
         'type':'input',
         'name':'T_complete',
-        'message':'Enter total brew time in seconds'
+        'message':'Enter total brew time '
     },
     
     {
-        'type': 'editor',
+        'type': 'input',
         'name': 'taste',
-        'message': 'Please write your taste notes',
-        'default': 'Taste Notes: ',
-        'eargs': {
-            'editor':'default',
-            'ext':'.txt'
-                }
+        'message': 'Please write your ',
+        'default': 'Taste Notes: '
     },
 
     {
-        'type': 'editor',
-        'name': 'R_taste',
-        'message': 'Please write any notes',
-        'default': 'Notes: ',
-        'eargs': {
-            'editor':'default',
-            'ext':'.txt'
-                }
+        'type': 'input',
+        'name': 'notes',
+        'message': 'Please write any ',
+        'default': 'Notes: '
     },
 ]   
 
 
+
 answers = prompt(questions)
-print(json.dumps(answers, indent=1))
+C_tolog = Coffee(
+    answers['brand'],
+    answers['R_date'],
+    answers['R_taste'],
+    answers['proccess'],
+    answers['grind'],
+    answers['B_method'],
+    answers['C_in'],
+    answers['C_out'],
+    answers['T_complete'],
+    answers['taste'],
+    answers['notes']
+    )
+
+if config['Switches']['location'] == 'local':
+    path = f"os.path.expanduser(~/Documents/Coffe_logs/){C_tolog.id_create()}.json"
+    with open(path,'w+') as outfile:
+        json.dump(C_tolog.__dict__,outfile)
+elif config['Switches']['location'] == 'cloud':
+    pass
