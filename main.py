@@ -4,6 +4,35 @@ from pprint import pprint
 import json
 import configparser
 from uuid import uuid1
+import os
+############
+def readConfig():
+    config = configparser.ConfigParser()
+    config.read("config.ini")
+    return config
+
+def Dict_output_create (C_tolog):
+    C_toOutput = C_tolog.__dict__
+    C_toOutput["ID"] = C_tolog.id_create()
+    C_toOutput["Ratio"] = C_tolog.ratio_calc()
+    C_toOutput["Date_created"] = datetime.datetime.now().strftime("%Y%m%d")
+    return C_toOutput
+
+def WriteOut_Log(config,C_toOutput):
+    if config['Switches']['location'] == 'local':
+        path = f"{config['Local']['location']}Coffe_Log.json"
+        if os.path.exists(path) == False:
+            with open(path,'a') as outfile:
+                json.dump([], outfile)
+        else:
+            with open(path,'r') as feedsjson:
+                feeds = json.load(feedsjson)
+            with open(path,'w') as outfile:
+                feeds.append(C_toOutput)
+                json.dump(feeds,outfile,indent=4)
+    elif config['Switches']['location'] == 'cloud':
+        pass
+
 class DateValidator(Validator):
     def validate(self,document):
         try:
@@ -11,6 +40,15 @@ class DateValidator(Validator):
         except ValueError:
             raise ValidationError(
                 message ="Incorrect data format, should be YYYY-MM-DD",
+                 cursor_position=len(document.text))
+
+class NumberValidator(Validator):
+    def validate(self, document):
+        try:
+            float(document.text)
+        except ValueError:
+            raise ValidationError(
+                message ="Input is not a number",
                  cursor_position=len(document.text))
 
 class Coffee(object):
@@ -40,12 +78,11 @@ class Coffee(object):
     def id_create(self):
         date_today = datetime.datetime.now().strftime("%Y%m%d")
         uid = str(uuid1())
-        unique_id = f"{date_today}_{self.B_method[0:3]}{uid}"
+        unique_id = f"{date_today}_{uid}"
         return unique_id
 
 
-config = configparser.ConfigParser()
-config.read("config.ini")
+
 
 questions = [
     {
@@ -91,14 +128,15 @@ questions = [
     {
         'type':'input',
         'name':'C_in',
-        'message':'Enter how much coffee was used in grams'
-        #need validation it is a number
+        'message':'Enter how much coffee was used in grams',
+        'validate': NumberValidator
     },
 
     {
         'type':'input',
         'name':'C_out',
-        'message':'Enter final yield of coffee/how much water was used in grams'
+        'message':'Enter final yield of coffee/how much water was used in grams',
+        'validate': NumberValidator
     },
 
     {
@@ -121,10 +159,8 @@ questions = [
         'default': 'Notes: '
     },
 ]   
-
-
-
 answers = prompt(questions)
+
 C_tolog = Coffee(
     answers['brand'],
     answers['R_date'],
@@ -139,18 +175,9 @@ C_tolog = Coffee(
     answers['notes']
     )
 
-C_toOutput = C_tolog.__dict__
-C_toOutput["ID"] = C_tolog.id_create()
-C_toOutput["Ratio"] = C_tolog.ratio_calc()
+config = readConfig()
 
-if config['Switches']['location'] == 'local':
-    path = f"{config['Local']['location']}Coffe_Log.json"
-    with open(path,'a') as outfile:
-        json.dump([], outfile)
-    with open(path,'r') as feedsjson:
-        feeds = json.load(feedsjson)
-    with open(path,'w') as outfile:
-        feeds.append(C_toOutput)
-        json.dump(feeds,outfile,indent=4)
-elif config['Switches']['location'] == 'cloud':
-    pass
+C_toOutput = Dict_output_create(C_tolog)
+
+
+WriteOut_Log(config,C_toOutput)
