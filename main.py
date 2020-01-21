@@ -139,9 +139,18 @@ C_tolog = Coffee(
     answers['notes']
     )
 
+C_toOutput = C_tolog.__dict__
+C_toOutput["ID"] = C_tolog.id_create()
+C_toOutput["Ratio"] = C_tolog.ratio_calc()
+
 if config['Switches']['location'] == 'local':
-    path = f"os.path.expanduser(~/Documents/Coffe_logs/){C_tolog.id_create()}.json"
-    with open(path,'w+') as outfile:
-        json.dump(C_tolog.__dict__,outfile)
+    path = f"{config['Local']['location']}Coffe_Log.json"
+    with open(path,'a') as outfile:
+        json.dump([], outfile)
+    with open(path,'r') as feedsjson:
+        feeds = json.load(feedsjson)
+    with open(path,'w') as outfile:
+        feeds.append(C_toOutput)
+        json.dump(feeds,outfile,indent=4)
 elif config['Switches']['location'] == 'cloud':
     pass
