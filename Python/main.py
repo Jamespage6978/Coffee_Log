@@ -82,8 +82,6 @@ class Coffee(object):
         return unique_id
 
 
-
-
 questions = [
     {
         'type': 'input',
@@ -178,6 +176,5 @@ C_tolog = Coffee(
 config = readConfig()
 
 C_toOutput = Dict_output_create(C_tolog)
-
 
 WriteOut_Log(config,C_toOutput)
