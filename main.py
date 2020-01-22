@@ -81,100 +81,102 @@ class Coffee(object):
         unique_id = f"{date_today}_{uid}"
         return unique_id
 
+if __name__ == '__main__':
 
-questions = [
-    {
-        'type': 'input',
-        'name': 'brand',
-        'message': 'Enter Coffee name',
-    },
 
-    {
-        'type': 'input',
-        'name': 'R_date',
-        'message': 'Enter Roast date (DD-MM-YYYY)',
-        'validate': DateValidator
-    },
-    
-    {
-        'type': 'input',
-        'name': 'R_taste',
-        'message': 'Please write the ',
-        'default': 'Roasters Taste Notes: '
-    },
-
-    {
-        'type':'list',
-        'name':'proccess',
-        'message':'Select the coffee proccess',
-        'choices':['Natural','Washed','Honey']
-    },
-
-    {
-        'type':'input',
-        'name':'grind',
-        'message':'Enter Grind setting/notes',
-    },
+    questions = [
+        {
+            'type': 'input',
+            'name': 'brand',
+            'message': 'Enter Coffee name',
+        },
 
         {
-        'type':'list',
-        'name':'B_method',
-        'message':'Select the Brew method',
-        'choices':['V60','Aeropress','Mellita Look IV','Espresso','French press','Stove top - Moka pot']
-    },
+            'type': 'input',
+            'name': 'R_date',
+            'message': 'Enter Roast date (DD-MM-YYYY)',
+            'validate': DateValidator
+        },
+        
+        {
+            'type': 'input',
+            'name': 'R_taste',
+            'message': 'Please write the ',
+            'default': 'Roasters Taste Notes: '
+        },
 
-    {
-        'type':'input',
-        'name':'C_in',
-        'message':'Enter how much coffee was used in grams',
-        'validate': NumberValidator
-    },
+        {
+            'type':'list',
+            'name':'proccess',
+            'message':'Select the coffee proccess',
+            'choices':['Natural','Washed','Honey']
+        },
 
-    {
-        'type':'input',
-        'name':'C_out',
-        'message':'Enter final yield of coffee/how much water was used in grams',
-        'validate': NumberValidator
-    },
+        {
+            'type':'input',
+            'name':'grind',
+            'message':'Enter Grind setting/notes',
+        },
 
-    {
-        'type':'input',
-        'name':'T_complete',
-        'message':'Enter total brew time '
-    },
-    
-    {
-        'type': 'input',
-        'name': 'taste',
-        'message': 'Please write your ',
-        'default': 'Taste Notes: '
-    },
+            {
+            'type':'list',
+            'name':'B_method',
+            'message':'Select the Brew method',
+            'choices':['V60','Aeropress','Mellita Look IV','Espresso','French press','Stove top - Moka pot']
+        },
 
-    {
-        'type': 'input',
-        'name': 'notes',
-        'message': 'Please write any ',
-        'default': 'Notes: '
-    },
-]   
-answers = prompt(questions)
+        {
+            'type':'input',
+            'name':'C_in',
+            'message':'Enter how much coffee was used in grams',
+            'validate': NumberValidator
+        },
 
-C_tolog = Coffee(
-    answers['brand'],
-    answers['R_date'],
-    answers['R_taste'],
-    answers['proccess'],
-    answers['grind'],
-    answers['B_method'],
-    answers['C_in'],
-    answers['C_out'],
-    answers['T_complete'],
-    answers['taste'],
-    answers['notes']
-    )
+        {
+            'type':'input',
+            'name':'C_out',
+            'message':'Enter final yield of coffee/how much water was used in grams',
+            'validate': NumberValidator
+        },
 
-config = readConfig()
+        {
+            'type':'input',
+            'name':'T_complete',
+            'message':'Enter total brew time '
+        },
+        
+        {
+            'type': 'input',
+            'name': 'taste',
+            'message': 'Please write your ',
+            'default': 'Taste Notes: '
+        },
 
-C_toOutput = Dict_output_create(C_tolog)
+        {
+            'type': 'input',
+            'name': 'notes',
+            'message': 'Please write any ',
+            'default': 'Notes: '
+        },
+    ]   
+    answers = prompt(questions)
 
-WriteOut_Log(config,C_toOutput)
+    C_tolog = Coffee(
+        answers['brand'],
+        answers['R_date'],
+        answers['R_taste'],
+        answers['proccess'],
+        answers['grind'],
+        answers['B_method'],
+        answers['C_in'],
+        answers['C_out'],
+        answers['T_complete'],
+        answers['taste'],
+        answers['notes']
+        )
+
+    config = readConfig()
+
+    C_toOutput = Dict_output_create(C_tolog)
+
+    WriteOut_Log(config,C_toOutput)
