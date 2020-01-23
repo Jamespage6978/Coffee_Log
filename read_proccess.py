@@ -2,6 +2,7 @@ from main import readConfig
 import os
 import configparser
 import json
+import pandas
 def read_log(config):
     if config['Switches']['location'] == 'local':
             path = f"{config['Local']['location']}Coffe_Log.json"
@@ -12,20 +13,19 @@ def read_log(config):
                     feeds = json.load(feedsjson)
     return feeds
 
-def brews_method_Comp(Log_Feed):
-    return 1
+def log_Dict(log):
+    df = pandas.DataFrame.from_records(log)
+    return df
+
+def write_html(config,Log_df):
+     if config['Switches']['location'] == 'local':
+        path = f"{config['Local']['location']}Coffe_Log.html"
+        with open(path,'w') as outfile:
+            outfile.write(Log_df.to_html())
+
 
 config = readConfig()
 Log_Feed = read_log(config)
-compare_log = []
-for i in range(len(Log_Feed)):
-    CurrentLog = Log_Feed[i]
-    if CurrentLog['B_method'] == "V60":
-        compare_log.append(CurrentLog)
-    else:
-        print("not this one")
-att_compare = ["R_taste","taste"]
+Log_df = log_Dict(Log_Feed)
 
-for i in range(len(compare_log)):
-    CurrentLog = compare_log[i]
-    print(f"{CurrentLog[att_compare[0]]} + {CurrentLog[att_compare[1]]}")
+write_html(config,Log_df)
