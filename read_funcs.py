@@ -1,5 +1,6 @@
 from config import configuration as config
 import os, json, pandas
+
 def read_log():
     """
     Reads the coffe log .json file and outputs feeds which is a python json of the log file
@@ -13,10 +14,10 @@ def read_log():
                     feeds = json.load(feedsjson)
     return feeds
 
-def log_ToDict(log):
+def log_ToDict():
     """
     inputs: coffe log JSON
     outputs: Pandas dataframe from Json file
     """
-    df = pandas.DataFrame.from_records(log)
+    df = pandas.DataFrame.from_records(read_log())
     return df

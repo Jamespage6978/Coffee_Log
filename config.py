@@ -6,3 +6,4 @@ def readConfig():
     return config
 
 configuration = readConfig()
+print(configuration.sections())

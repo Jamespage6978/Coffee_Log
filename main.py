@@ -1,5 +1,6 @@
 from config import configuration as config
-from read_proccess import write_html
+from write_funcs import write_html
+from read_funcs import read_log
 ##
 from PyInquirer import prompt, print_json,ValidationError,Validator
 import datetime, json, os, pandas
@@ -20,12 +21,11 @@ def WriteOut_Log(C_toOutput):
         if os.path.exists(path) == False:
             with open(path,'a') as outfile:
                 json.dump([], outfile)
-        
-        with open(path,'r') as feedsjson:
-            feeds = json.load(feedsjson)
-        with open(path,'w') as outfile:
-            feeds.append(C_toOutput)
-            json.dump(feeds,outfile,indent=4)
+        else:
+            feeds = read_log() 
+            with open(path,'w') as outfile:
+                feeds.append(C_toOutput)
+                json.dump(feeds,outfile,indent=4)
     elif config['Switches']['location'] == 'cloud':
         pass
 
