@@ -20,12 +20,12 @@ def WriteOut_Log(C_toOutput):
         if os.path.exists(path) == False:
             with open(path,'a') as outfile:
                 json.dump([], outfile)
-        else:
-            with open(path,'r') as feedsjson:
-                feeds = json.load(feedsjson)
-            with open(path,'w') as outfile:
-                feeds.append(C_toOutput)
-                json.dump(feeds,outfile,indent=4)
+        
+        with open(path,'r') as feedsjson:
+            feeds = json.load(feedsjson)
+        with open(path,'w') as outfile:
+            feeds.append(C_toOutput)
+            json.dump(feeds,outfile,indent=4)
     elif config['Switches']['location'] == 'cloud':
         pass
 
