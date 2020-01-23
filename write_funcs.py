@@ -1,4 +1,4 @@
-from config import configuration
+from config import configuration as config
 from read_funcs import log_ToDict
 #
 import os, json, pandas

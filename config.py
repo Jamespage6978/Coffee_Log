@@ -2,7 +2,7 @@ import configparser
 
 def readConfig():
     config = configparser.ConfigParser()
-    config.read("config.ini")
+    config.read("config1.ini")
     return config
 
 configuration = readConfig()
