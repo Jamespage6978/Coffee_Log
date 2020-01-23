@@ -1,15 +1,11 @@
+from config import configuration as config
+from read_proccess import write_html
+##
 from PyInquirer import prompt, print_json,ValidationError,Validator
-import datetime
+import datetime, json, os, pandas
 from pprint import pprint
-import json
-import configparser
 from uuid import uuid1
-import os
 ############
-def readConfig():
-    config = configparser.ConfigParser()
-    config.read("config.ini")
-    return config
 
 def Dict_output_create (C_tolog):
     C_toOutput = C_tolog.__dict__
@@ -18,7 +14,7 @@ def Dict_output_create (C_tolog):
     C_toOutput["Date_created"] = datetime.datetime.now().strftime("%Y%m%d")
     return C_toOutput
 
-def WriteOut_Log(config,C_toOutput):
+def WriteOut_Log(C_toOutput):
     if config['Switches']['location'] == 'local':
         path = f"{config['Local']['location']}Coffe_Log.json"
         if os.path.exists(path) == False:
@@ -33,56 +29,8 @@ def WriteOut_Log(config,C_toOutput):
     elif config['Switches']['location'] == 'cloud':
         pass
 
-class DateValidator(Validator):
-    def validate(self,document):
-        try:
-            datetime.datetime.strptime(document.text, '%d-%m-%Y')
-        except ValueError:
-            raise ValidationError(
-                message ="Incorrect data format, should be YYYY-MM-DD",
-                 cursor_position=len(document.text))
-
-class NumberValidator(Validator):
-    def validate(self, document):
-        try:
-            float(document.text)
-        except ValueError:
-            raise ValidationError(
-                message ="Input is not a number",
-                 cursor_position=len(document.text))
-
-class Coffee(object):
-    def __init__(self,brand,R_date,R_taste,proccess,grind,B_method,C_in,C_out,T_complete,taste,notes):
-        self.brand = brand
-        self.R_date = R_date
-        self.R_taste = R_taste
-        self.proccess = proccess
-        self.grind = grind
-        self.B_method = B_method
-        self.C_in = C_in
-        self.C_out = C_out
-        self.T_complete = T_complete
-        self.taste = taste
-        self.notes = notes
-
-    def ratio_calc(self):
-        if self.B_method == "espresso":
-            rat_calcd = float(self.C_out)/float(self.C_in)
-            ratio = f"1:{rat_calcd}"
-        else:
-            rat_calcd = (1000.0/float(self.C_out))
-            C_in_calc = float(self.C_in)*rat_calcd
-            ratio = f"{C_in_calc}grams per 1000ml/1L"
-        return ratio
-
-    def id_create(self):
-        date_today = datetime.datetime.now().strftime("%Y%m%d")
-        uid = str(uuid1())
-        unique_id = f"{date_today}_{uid}"
-        return unique_id
-
-if __name__ == '__main__':
-
+def input_Log():
+    ################ Define and ask questions
     questions = [
         {
             'type': 'input',
@@ -159,7 +107,7 @@ if __name__ == '__main__':
         },
     ]   
     answers = prompt(questions)
-
+    ##################
     C_tolog = Coffee(
         answers['brand'],
         answers['R_date'],
@@ -174,8 +122,59 @@ if __name__ == '__main__':
         answers['notes']
         )
 
-    config = readConfig()
-
     C_toOutput = Dict_output_create(C_tolog)
+    return C_toOutput
 
-    WriteOut_Log(config,C_toOutput)
+class DateValidator(Validator):
+    def validate(self,document):
+        try:
+            datetime.datetime.strptime(document.text, '%d-%m-%Y')
+        except ValueError:
+            raise ValidationError(
+                message ="Incorrect data format, should be YYYY-MM-DD",
+                 cursor_position=len(document.text))
+
+class NumberValidator(Validator):
+    def validate(self, document):
+        try:
+            float(document.text)
+        except ValueError:
+            raise ValidationError(
+                message ="Input is not a number",
+                 cursor_position=len(document.text))
+
+class Coffee(object):
+    def __init__(self,brand,R_date,R_taste,proccess,grind,B_method,C_in,C_out,T_complete,taste,notes):
+        self.brand = brand
+        self.R_date = R_date
+        self.R_taste = R_taste
+        self.proccess = proccess
+        self.grind = grind
+        self.B_method = B_method
+        self.C_in = C_in
+        self.C_out = C_out
+        self.T_complete = T_complete
+        self.taste = taste
+        self.notes = notes
+
+    def ratio_calc(self):
+        if self.B_method == "espresso":
+            rat_calcd = float(self.C_out)/float(self.C_in)
+            ratio = f"1:{rat_calcd}"
+        else:
+            rat_calcd = (1000.0/float(self.C_out))
+            C_in_calc = float(self.C_in)*rat_calcd
+            ratio = f"{C_in_calc}grams per 1000ml/1L"
+        return ratio
+
+    def id_create(self):
+        date_today = datetime.datetime.now().strftime("%Y%m%d")
+        uid = str(uuid1())
+        unique_id = f"{date_today}_{uid}"
+        return unique_id
+
+
+
+if __name__ == '__main__':
+    WriteOut_Log(input_Log())
+    write_html()
