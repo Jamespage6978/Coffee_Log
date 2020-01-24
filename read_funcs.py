@@ -21,3 +21,4 @@ def log_ToDict():
     """
     df = pandas.DataFrame.from_records(read_log())
     return df
+
