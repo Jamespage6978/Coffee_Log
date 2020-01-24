@@ -1,15 +1,12 @@
+from config import configuration as config
+from write_funcs import write_html
+from read_funcs import read_log
+##
 from PyInquirer import prompt, print_json,ValidationError,Validator
-import datetime
+import datetime, json, os, pandas
 from pprint import pprint
-import json
-import configparser
 from uuid import uuid1
-import os
 ############
-def readConfig():
-    config = configparser.ConfigParser()
-    config.read("config.ini")
-    return config
 
 def Dict_output_create (C_tolog):
     C_toOutput = C_tolog.__dict__
@@ -18,20 +15,115 @@ def Dict_output_create (C_tolog):
     C_toOutput["Date_created"] = datetime.datetime.now().strftime("%Y%m%d")
     return C_toOutput
 
-def WriteOut_Log(config,C_toOutput):
+def WriteOut_Log(C_toOutput):
     if config['Switches']['location'] == 'local':
         path = f"{config['Local']['location']}Coffe_Log.json"
         if os.path.exists(path) == False:
             with open(path,'a') as outfile:
                 json.dump([], outfile)
         else:
-            with open(path,'r') as feedsjson:
-                feeds = json.load(feedsjson)
+            feeds = read_log() 
             with open(path,'w') as outfile:
                 feeds.append(C_toOutput)
                 json.dump(feeds,outfile,indent=4)
     elif config['Switches']['location'] == 'cloud':
         pass
+
+def input_Log():
+    ################ Define and ask questions
+    questions = [
+        {
+            'type': 'input',
+            'name': 'brand',
+            'message': 'Enter Coffee name',
+        },
+
+        {
+            'type': 'input',
+            'name': 'R_date',
+            'message': 'Enter Roast date (DD-MM-YYYY)',
+            'validate': DateValidator
+        },
+        
+        {
+            'type': 'input',
+            'name': 'R_taste',
+            'message': 'Please write the ',
+            'default': 'Roasters Taste Notes: '
+        },
+
+        {
+            'type':'list',
+            'name':'proccess',
+            'message':'Select the coffee proccess',
+            'choices':['Natural','Washed','Honey']
+        },
+
+        {
+            'type':'input',
+            'name':'grind',
+            'message':'Enter Grind setting/notes',
+        },
+
+            {
+            'type':'list',
+            'name':'B_method',
+            'message':'Select the Brew method',
+            'choices':['V60','Aeropress','Mellita Look IV','Espresso','French press','Stove top - Moka pot']
+        },
+
+        {
+            'type':'input',
+            'name':'C_in',
+            'message':'Enter how much coffee was used in grams',
+            'validate': NumberValidator
+        },
+
+        {
+            'type':'input',
+            'name':'C_out',
+            'message':'Enter final yield of coffee/how much water was used in grams',
+            'validate': NumberValidator
+        },
+
+        {
+            'type':'input',
+            'name':'T_complete',
+            'message':'Enter total brew time '
+        },
+        
+        {
+            'type': 'input',
+            'name': 'taste',
+            'message': 'Please write your ',
+            'default': 'Taste Notes: '
+        },
+
+        {
+            'type': 'input',
+            'name': 'notes',
+            'message': 'Please write any ',
+            'default': 'Notes: '
+        },
+    ]   
+    answers = prompt(questions)
+    ##################
+    C_tolog = Coffee(
+        answers['brand'],
+        answers['R_date'],
+        answers['R_taste'],
+        answers['proccess'],
+        answers['grind'],
+        answers['B_method'],
+        answers['C_in'],
+        answers['C_out'],
+        answers['T_complete'],
+        answers['taste'],
+        answers['notes']
+        )
+
+    C_toOutput = Dict_output_create(C_tolog)
+    return C_toOutput
 
 class DateValidator(Validator):
     def validate(self,document):
@@ -68,7 +160,7 @@ class Coffee(object):
     def ratio_calc(self):
         if self.B_method == "espresso":
             rat_calcd = float(self.C_out)/float(self.C_in)
-            ratio = f"1:{rat_calcd}"
+            ratio = f"1:{round(rat_calcd,2)}"
         else:
             rat_calcd = (1000.0/float(self.C_out))
             C_in_calc = float(self.C_in)*rat_calcd
@@ -82,99 +174,7 @@ class Coffee(object):
         return unique_id
 
 
-questions = [
-    {
-        'type': 'input',
-        'name': 'brand',
-        'message': 'Enter Coffee name',
-    },
 
-    {
-        'type': 'input',
-        'name': 'R_date',
-        'message': 'Enter Roast date (DD-MM-YYYY)',
-        'validate': DateValidator
-    },
-    
-    {
-        'type': 'input',
-        'name': 'R_taste',
-        'message': 'Please write the ',
-        'default': 'Roasters Taste Notes: '
-    },
-
-    {
-        'type':'list',
-        'name':'proccess',
-        'message':'Select the coffee proccess',
-        'choices':['Natural','Washed','Honey']
-    },
-
-    {
-        'type':'input',
-        'name':'grind',
-        'message':'Enter Grind setting/notes',
-    },
-
-        {
-        'type':'list',
-        'name':'B_method',
-        'message':'Select the Brew method',
-        'choices':['V60','Aeropress','Mellita Look IV','Espresso','French press','Stove top - Moka pot']
-    },
-
-    {
-        'type':'input',
-        'name':'C_in',
-        'message':'Enter how much coffee was used in grams',
-        'validate': NumberValidator
-    },
-
-    {
-        'type':'input',
-        'name':'C_out',
-        'message':'Enter final yield of coffee/how much water was used in grams',
-        'validate': NumberValidator
-    },
-
-    {
-        'type':'input',
-        'name':'T_complete',
-        'message':'Enter total brew time '
-    },
-    
-    {
-        'type': 'input',
-        'name': 'taste',
-        'message': 'Please write your ',
-        'default': 'Taste Notes: '
-    },
-
-    {
-        'type': 'input',
-        'name': 'notes',
-        'message': 'Please write any ',
-        'default': 'Notes: '
-    },
-]   
-answers = prompt(questions)
-
-C_tolog = Coffee(
-    answers['brand'],
-    answers['R_date'],
-    answers['R_taste'],
-    answers['proccess'],
-    answers['grind'],
-    answers['B_method'],
-    answers['C_in'],
-    answers['C_out'],
-    answers['T_complete'],
-    answers['taste'],
-    answers['notes']
-    )
-
-config = readConfig()
-
-C_toOutput = Dict_output_create(C_tolog)
-
-WriteOut_Log(config,C_toOutput)
+if __name__ == '__main__':
+    WriteOut_Log(input_Log())
+    write_html()
