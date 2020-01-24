@@ -9,10 +9,10 @@ def write_html():
     Log_df = log_ToDict()
     pandas.set_option('colheader_justify', 'center')
     if config['Switches']['location'] == 'local':
-        path = "HTML\Coffee_Log.html"#f"{config['Local']['location']}Coffe_Log.html"
+        path = "Coffee_Log.html"#f"{config['Local']['location']}Coffe_Log.html"
         html_string = '''<html>
   <head><title>HTML Pandas Dataframe with CSS</title></head>
-  <link rel="stylesheet" type="text/css" href="df_style.css"/>
+  <link rel="stylesheet" type="text/css" href="static\df_style.css"/>
   <body>
     {table}
   </body>
