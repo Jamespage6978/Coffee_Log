@@ -160,7 +160,7 @@ class Coffee(object):
     def ratio_calc(self):
         if self.B_method == "espresso":
             rat_calcd = float(self.C_out)/float(self.C_in)
-            ratio = f"1:{rat_calcd}"
+            ratio = f"1:{round(rat_calcd,2)}"
         else:
             rat_calcd = (1000.0/float(self.C_out))
             C_in_calc = float(self.C_in)*rat_calcd
