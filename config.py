@@ -1,4 +1,5 @@
 import configparser
+import os
 
 def readConfig():
     config = configparser.ConfigParser()
@@ -6,3 +7,5 @@ def readConfig():
     return config
 
 configuration = readConfig()
+configuration['Local']['location'] = os.getcwd() + "\\data\\"
+print(configuration['Local']['location'])

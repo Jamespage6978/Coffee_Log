@@ -21,6 +21,7 @@ def WriteOut_Log(C_toOutput):
         if os.path.exists(path) == False:
             with open(path,'a') as outfile:
                 json.dump([], outfile)
+                WriteOut_Log(C_toOutput)
         else:
             feeds = read_log() 
             with open(path,'w') as outfile:
